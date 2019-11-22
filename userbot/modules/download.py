@@ -136,7 +136,7 @@ async def gdrive_upload(filename: str, filebuf: BytesIO = None) -> str:
         if mime_type[0] and mime_type[1]:
             filedata['mimeType'] = f"{mime_type[0]}/{mime_type[1]}"
         else:
-            filedata['mimeType'] = 'text/plain'
+            filedata['mimeType'] = 'application/octet-stream'
         file = drive.CreateFile(filedata)
         file.content = filebuf
     else:
