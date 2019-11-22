@@ -143,7 +143,11 @@ async def gdrive_upload(filename: str, filebuf: BytesIO = None) -> str:
         file = drive.CreateFile(filedata)
         file.SetContentFile(filename)
     name = filename.split('/')[-1]
-    file.Upload()
+    
+    if GDRIVE_TEAMDRIVE_ID:
+        file.Upload(param={'supportsTeamDrives': True})
+    else:
+        file.Upload()
     # insert new permission
     file.InsertPermission({
         'type': 'anyone',
