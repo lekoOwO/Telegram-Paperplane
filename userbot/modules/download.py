@@ -157,6 +157,7 @@ async def gdrive_upload(filename: str, filebuf: BytesIO = None) -> str:
     
     if not filebuf:
         os.remove(filename)
+    file['downloadUrl'] = file['downloadUrl'].replace("gd=true", "authuser=0")
     reply = f"[{name}]({file['alternateLink']})\n" \
         f"__Direct link:__ [Here]({file['downloadUrl']})"
     return reply
