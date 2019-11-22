@@ -182,6 +182,7 @@ async def gdrive_mirror(request):
         await request.edit(f'`Uploading {filen} to GDrive...`')
         reply += await gdrive_upload(
             filen, buf) if buf else await gdrive_upload(filen)
+        await request.edit(reply)
     elif "|" in message:
         url, file_name = message.split("|")
         url = url.strip()
@@ -191,6 +192,7 @@ async def gdrive_mirror(request):
         await request.edit(status)
         await request.edit(f'`Uploading {file_name} to GDrive...`')
         reply += await gdrive_upload(file_name)
+        await request.edit(reply)
     if "nosecret" in reply:
         reply = "`Run the generate_drive_session.py file " \
                 "in your machine to authenticate on google drive!!`"
