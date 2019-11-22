@@ -92,6 +92,7 @@ else:
 CURRENCY_API = os.environ.get("CURRENCY_API", None)
 
 GDRIVE_FOLDER = os.environ.get("GDRIVE_FOLDER", None)
+GDRIVE_TEAMDRIVE_ID = os.environ.get("GDRIVE_TEAMDRIVE_ID", None)
 
 # pylint: disable=invalid-name
 bot = TelegramClient("userbot", API_KEY, API_HASH)

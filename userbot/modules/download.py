@@ -26,7 +26,7 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from telethon.tl.types import DocumentAttributeVideo, MessageMediaPhoto
 
-from userbot import CMD_HELP, GDRIVE_FOLDER, LOGS
+from userbot import CMD_HELP, GDRIVE_FOLDER, LOGS, GDRIVE_TEAMDRIVE_ID
 from userbot.events import register
 
 TEMP_DOWNLOAD_DIRECTORY = os.environ.get("TMP_DOWNLOAD_DIRECTORY", "./")
@@ -128,6 +128,8 @@ async def gdrive_upload(filename: str, filebuf: BytesIO = None) -> str:
             "id": GDRIVE_FOLDER
         }]
     }
+    if GDRIVE_TEAMDRIVE_ID:
+        filedata["parents"]["teamDriveId"] = GDRIVE_TEAMDRIVE_ID
 
     if filebuf:
         mime_type = guess_type(filename)
