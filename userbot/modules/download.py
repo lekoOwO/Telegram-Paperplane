@@ -129,7 +129,7 @@ async def gdrive_upload(filename: str, filebuf: BytesIO = None) -> str:
         }]
     }
     if GDRIVE_TEAMDRIVE_ID:
-        filedata["parents"]["teamDriveId"] = GDRIVE_TEAMDRIVE_ID
+        filedata["parents"][0]["teamDriveId"] = GDRIVE_TEAMDRIVE_ID
 
     if filebuf:
         mime_type = guess_type(filename)
