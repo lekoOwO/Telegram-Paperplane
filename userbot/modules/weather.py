@@ -197,6 +197,6 @@ CMD_HELP.update({
 })
 
 CMD_HELP.update({
-    "weather": ".setcity <city> or .setcity <city>, <country name/code>\n"
+    "setcity": ".setcity <city> or .setcity <city>, <country name/code>\n"
                "Usage: Sets your default city so you can just use .weather."
 })
