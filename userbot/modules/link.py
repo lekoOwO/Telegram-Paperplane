@@ -10,7 +10,7 @@ def __title(url):
     return title
 
 @register(outgoing=True, pattern="^.link(?: |$)(.*)")
-async def weather(bot):
+async def link(bot):
     if not bot.pattern_match.group(1):
         await bot.edit("`Please insert a URL.`")
     else:
