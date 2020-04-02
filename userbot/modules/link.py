@@ -7,6 +7,7 @@ def __title(url):
     r = requests.get(url)
     tree = fromstring(r.content)
     title = tree.findtext('.//title')
+    return title
 
 @register(outgoing=True, pattern="^.link(?: |$)(.*)")
 async def weather(bot):
