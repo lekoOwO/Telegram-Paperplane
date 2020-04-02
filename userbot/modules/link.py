@@ -5,7 +5,7 @@ from lxml.html import fromstring
 
 def __title(url):
     r = requests.get(url)
-    tree = fromstring(r.content)
+    tree = fromstring(r.text)
     title = tree.findtext('.//title')
     return title
 
