@@ -8,6 +8,11 @@ from userbot.events import register
 
 from typing import Union
 
+def support_streaming(filename):
+    _, file_extension = os.path.splitext(filename)
+    file_extension = file_extension.lower()
+    return file_extension in ["flac", "mp3", "ogg", "m4a", "wav", "mp4"]
+
 def count(limit = 10):
     count = 0
     while True:
@@ -65,7 +70,8 @@ async def download_from_tg(message, callback=None) -> (str, Union[BytesIO, None]
                 buf.name = filen
 
     except AttributeError:
-        buf = await dl_file()
+        if not buf:
+            buf = await dl_file()
         try:
             filen = message.file.name
         except AttributeError:
@@ -81,7 +87,7 @@ async def download_from_tg(message, callback=None) -> (str, Union[BytesIO, None]
 @register(pattern=r"^.resendf(?:[ |$]?)(.*)", outgoing=True)
 async def resend(bot):
     text = bot.pattern_match.group(1)
-    text = text if text else '`.`'
+    text = text if text else ''
 
     if not bot.file:
         print(bot)
@@ -90,20 +96,26 @@ async def resend(bot):
 
     filen, buf = await download_from_tg(bot)
 
+    await bot.delete()
+
     if buf:
         uploaded_file = await bot.client.upload_file(file=buf, file_name=filen, part_size_kb=512,
             progress_callback=upload_progress()
         )
-        await bot.edit(text=text, parse_mode='Markdown', file=uploaded_file)
+        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown", 
+            support_streaming=support_streaming(filen)
+        )
     else:
         uploaded_file = await bot.client.upload_file(file=filen, progress_callback=upload_progress())
-        await bot.edit(text=text, parse_mode='Markdown', file=uploaded_file, part_size_kb=512)
+        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown", 
+            support_streaming=support_streaming(filen)
+        )
         os.remove(filen)
 
 @register(pattern=r"^.resendr(?:[ |$]?)(.*)", outgoing=True)
 async def resend_reply(bot):
     text = bot.pattern_match.group(1)
-    text = text if text else '`.`'
+    text = text if text else ''
 
     message = await bot.get_reply_message()
 
@@ -112,10 +124,7 @@ async def resend_reply(bot):
         await bot.edit(text="`No file found!`", parse_mode='Markdown')
         return
 
-    await bot.delete()
-    empty_file = BytesIO(" ".encode("UTF-8"))
-    empty_file.name = "empty"
-    bot = await message.reply(message="Downloading...", parse_mode="Markdown", file=empty_file)
+    await bot.edit(text="Downloading...", parse_mode="Markdown")
 
     filen, buf = await download_from_tg(await bot.get_reply_message(), 
         lambda current, total: bot.edit(f"`Downloading... {round((current / total) * 100, 2)}%`")
@@ -127,13 +136,18 @@ async def resend_reply(bot):
         uploaded_file = await bot.client.upload_file(file=buf, file_name=filen, part_size_kb=512, 
             progress_callback=upload_progress(lambda current, total: bot.edit(f"`Uploading... {round((current / total) * 100, 2)}%`"))
         )
-        await bot.edit(text=text, parse_mode='Markdown', file=uploaded_file)
+        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown", reply_to=bot.message.reply_to_msg_id
+            support_streaming=support_streaming(filen)
+        )
     else:
         uploaded_file = await bot.client.upload_file(file=filen, part_size_kb=512,
             progress_callback=upload_progress(lambda current, total: bot.edit(f"`Uploading... {round((current / total) * 100, 2)}%`"))
         )
-        await bot.edit(text=text, parse_mode='Markdown', file=uploaded_file)
+        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown", reply_to=bot.message.reply_to_msg_id
+            support_streaming=support_streaming(filen)
+        )
         os.remove(filen)
+    await bot.delete()
 
 CMD_HELP.update({
     "resend":
