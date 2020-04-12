@@ -95,6 +95,7 @@ async def resend(bot):
         return
 
     filen, buf = await download_from_tg(bot)
+    is_stream = support_streaming(filen)
 
     await bot.delete()
 
@@ -102,14 +103,10 @@ async def resend(bot):
         uploaded_file = await bot.client.upload_file(file=buf, file_name=filen, part_size_kb=512,
             progress_callback=upload_progress()
         )
-        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown", 
-            support_streaming=support_streaming(filen)
-        )
+        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown", support_streaming=is_stream)
     else:
         uploaded_file = await bot.client.upload_file(file=filen, progress_callback=upload_progress())
-        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown", 
-            support_streaming=support_streaming(filen)
-        )
+        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown", support_streaming=is_stream)
         os.remove(filen)
 
 @register(pattern=r"^.resendr(?:[ |$]?)(.*)", outgoing=True)
@@ -129,6 +126,7 @@ async def resend_reply(bot):
     filen, buf = await download_from_tg(await bot.get_reply_message(), 
         lambda current, total: bot.edit(f"`Downloading... {round((current / total) * 100, 2)}%`")
     )
+    is_stream = support_streaming(filen)
 
     await bot.edit(text="`Uploading...`", parse_mode='Markdown')
 
@@ -136,15 +134,17 @@ async def resend_reply(bot):
         uploaded_file = await bot.client.upload_file(file=buf, file_name=filen, part_size_kb=512, 
             progress_callback=upload_progress(lambda current, total: bot.edit(f"`Uploading... {round((current / total) * 100, 2)}%`"))
         )
-        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown", reply_to=bot.message.reply_to_msg_id
-            support_streaming=support_streaming(filen)
+        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown",
+            reply_to=bot.message.reply_to_msg_id,
+            support_streaming=is_stream
         )
     else:
         uploaded_file = await bot.client.upload_file(file=filen, part_size_kb=512,
             progress_callback=upload_progress(lambda current, total: bot.edit(f"`Uploading... {round((current / total) * 100, 2)}%`"))
         )
-        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown", reply_to=bot.message.reply_to_msg_id
-            support_streaming=support_streaming(filen)
+        await bot.client.send_file(bot.chat_id, uploaded_file, caption=text, parse_mode="Markdown",
+            reply_to=bot.message.reply_to_msg_id,
+            support_streaming=is_stream
         )
         os.remove(filen)
     await bot.delete()
