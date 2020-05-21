@@ -6,8 +6,10 @@ from lxml.html import fromstring
 def __title(url):
     r = requests.get(url)
     tree = fromstring(r.text)
-    title = tree.findtext('.//title')
-    return title
+    try:
+        return tree.find('.//meta[@property="og:title"]').get('content')
+    except:
+        return tree.findtext('.//title')
 
 @register(outgoing=True, pattern="^.link(?: |$)(.*)")
 async def link(bot):
