@@ -7,9 +7,10 @@ def __title(url):
     r = requests.get(url)
     tree = fromstring(r.text)
     try:
-        return tree.find('.//meta[@property="og:title"]').get('content')
+        title = tree.find('.//meta[@property="og:title"]').get('content')
     except:
-        return tree.findtext('.//title')
+        pass
+    return title or tree.findtext('.//title')
 
 @register(outgoing=True, pattern="^.link(?: |$)(.*)")
 async def link(bot):
